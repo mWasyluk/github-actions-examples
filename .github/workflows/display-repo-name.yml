@@ -1,0 +1,10 @@
+name: Display Repository Name
+on: workflow_dispatch
+jobs:
+  get-repo-name:
+    runs-on: ubuntu-latest
+    env: 
+      REPO_NAME: ${{ github.repository }}
+    steps:
+      - name: Display repository name
+        run: echo $REPO_NAME
