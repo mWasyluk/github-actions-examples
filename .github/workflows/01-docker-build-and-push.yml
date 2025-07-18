@@ -8,7 +8,7 @@ on:
 env:
     MODULE_PATH: ./01-docker-build-and-push
     DOCKER_IMAGE_NAME: "github-actions-examples:01-docker-build-and-push"
-    NGINX_RESPONSE_STRING: "Hello, World!"
+    NGINX_RESPONSE_STRING: "Hello, Worlfd!"
 
 jobs: 
     build:
