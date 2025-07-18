@@ -1,0 +1,43 @@
+name: 01-docker-build-and-push
+
+on: 
+    push:
+        paths: 
+            - "**01-docker-build-and-push**"
+
+env:
+    MODULE_PATH: "./01-docker-build-and-push"
+    DOCKER_IMAGE_NAME: "github-actions-examples:01-docker-build-and-push"
+    NGINX_RESPONSE_STRING: "Hello, World!"
+
+jobs: 
+    build:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            - name: Build image
+              run: docker build -t $DOCKER_IMAGE_NAME $MODULE_PATH
+
+            - name: Run container
+              run: docker run -d --rm -p 8080:80 $DOCKER_IMAGE_NAME
+
+            - name: Test container
+              run: |
+                sleep 2
+                curl -s http://localhost:8080 | grep -q "$NGINX_RESPONSE_STRING"
+
+            - name: Prepare full image name
+              run: echo "DOCKER_FULL_IMAGE_NAME=${{secrets.DOCKER_USER}}/$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
+
+            - name: Tag image
+              run: docker tag $DOCKER_IMAGE_NAME $DOCKER_FULL_IMAGE_NAME
+
+            - name: Login do DockerHub
+              if: success()
+              run: echo ${{secrets.DOCKER_TOKEN}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+            
+            - name: Push image
+              if: success()
+              run: docker push $DOCKER_FULL_IMAGE_NAME
