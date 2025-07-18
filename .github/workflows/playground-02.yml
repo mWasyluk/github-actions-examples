@@ -1,0 +1,20 @@
+name: Extract repository name from github context
+
+on: 
+  push:
+    paths:
+      - ".github/workflows/playground-02.yml"
+  workflow_dispatch:
+
+jobs:
+  display_repository_name:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Extract
+        env:
+          OWNER_AND_REPO: ${{ github.repository }}
+        run: echo "REPO_NAME=$(echo "$OWNER_AND_REPO" | cut -d/ -f2)" >> $GITHUB_ENV
+
+      - name: Display
+        run: |
+          echo "The repo name is: $REPO_NAME"
