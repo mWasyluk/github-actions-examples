@@ -28,11 +28,13 @@ jobs:
                 sleep 2
                 curl -s http://localhost:8080 | grep -q "$NGINX_RESPONSE_STRING"
 
+            - name: Prepare full image name
+              env: 
+                DOCKER_FULL_IMAGE_NAME: ${{secrets.DOCKER_USER}}/$DOCKER_IMAGE_NAME
+              run: echo "DOCKER_FULL_IMAGE_NAME=$DOCKER_FULL_IMAGE_NAME" >> $GITHUB_ENV
+
             - name: Tag image
-              run: |
-                echo "DOCKER_FULL_IMAGE_NAME=${{secrets.DOCKER_USER}}/$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
-                echo $DOCKER_FULL_IMAGE_NAME
-                docker tag $DOCKER_IMAGE_NAME $DOCKER_FULL_IMAGE_NAME
+              run: docker tag $DOCKER_IMAGE_NAME $DOCKER_FULL_IMAGE_NAME
 
             - name: Login do DockerHub
               if: success()
