@@ -6,7 +6,7 @@ on:
             - "**01-docker-build-and-push**"
 
 env:
-    MODULE_PATH: ./01-docker-build-and-push
+    MODULE_PATH: "./01-docker-build-and-push"
     DOCKER_IMAGE_NAME: "github-actions-examples:01-docker-build-and-push"
     NGINX_RESPONSE_STRING: "Hello, World!"
 
@@ -28,4 +28,15 @@ jobs:
                 sleep 2
                 curl -s http://localhost:8080 | grep -q "$NGINX_RESPONSE_STRING"
 
-    
+            - name: Tag image
+              run: |
+                echo "DOCKER_FULL_IMAGE_NAME=${{secrets.DOCKER_USER}}/$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
+                docker tag $DOCKER_IMAGE_NAME $DOCKER_FULL_IMAGE_NAME
+
+            - name: Login do DockerHub
+              if: success()
+              run: echo ${{secrets.DOCKER_TOKEN}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+            
+            - name: Push image
+              if: success()
+              run: docker push $DOCKER_FULL_IMAGE_NAME
