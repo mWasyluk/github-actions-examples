@@ -13,8 +13,12 @@ jobs:
       - name: Extract
         env:
           OWNER_AND_REPO: ${{ github.repository }}
-        run: echo "REPO_NAME=$(echo "$OWNER_AND_REPO" | cut -d/ -f2)" >> $GITHUB_ENV
-
-      - name: Display
         run: |
-          echo "The repo name is: $REPO_NAME"
+          echo "REPO_NAME_CUT=$(echo "$OWNER_AND_REPO" | cut -d/ -f2)" >> $GITHUB_ENV
+          echo "REPO_NAME_BASH=${OWNER_AND_REPO#*/}" >> $GITHUB_ENV
+
+      - name: Display 
+        run: |
+          echo "Repo name extracted with cut: $REPO_NAME_CUT"
+          echo "Repo name extracted with string manipulation script: $REPO_NAME_BASH"
+  
