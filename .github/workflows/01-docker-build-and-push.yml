@@ -26,6 +26,6 @@ jobs:
             - name: Test container
               run: |
                 sleep 2
-                curl -s http://localhost:8080 | grep -q $NGINX_RESPONSE_STRING
+                curl -s http://localhost:8080 | grep -q "$NGINX_RESPONSE_STRING"
 
     
