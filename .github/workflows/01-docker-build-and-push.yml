@@ -1,0 +1,48 @@
+name: 01-docker-build-and-push
+
+on: 
+    push:
+        branches: [main]
+        paths: 
+            - "**01-docker-build-and-push**"
+
+jobs: 
+    build-and-push:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Provide repository name
+              env: 
+                OWNER_REPOSITORY: ${{github.repository}}
+              run: echo "DOCKER_REPOSITORY=${OWNER_REPOSITORY#*/}" >> $GITHUB_ENV
+
+            - name: Provide tag
+              env: 
+                WORKFLOW: ${{github.event.workflow}}
+              run: |
+                echo "${{toJson(github)}}"
+                echo "${{github.workflow}}"
+                echo "DOCKER_TAG=${WORKFLOW##*/}" >> $GITHUB_ENV
+
+            - name: Validate variables
+              if: ${{ !env.DOCKER_REPOSITORY || !env.DOCKER_TAG }}
+              run: |
+                echo "Variable DOCKER_REPOSITORY='$DOCKER_REPOSITORY' or DOCKER_TAG='$DOCKER_TAG' are invalid. Exiting with non 0 code."
+                exit 1
+            
+            - name: Provide full image name
+              if: success()
+              env: 
+                DOCKER_USER: ${{secrets.DOCKER_USER}}
+              run: echo "DOCKER_FULL_NAME=$DOCKER_USER/$DOCKER_REPOSITORY:$DOCKER_TAG" >> $GITHUB_ENV
+
+            - name: Build image
+              if: success()
+              run: docker build -t $DOCKER_FULL_NAME .
+
+            - name: Run container
+              if: success()
+              run: docker run -d --rm -p 8080:80 $DOCKER_FULL_NAME
+
+            - name: Test container
+              if: success()
+              run: curl --fail http://localhost:8080
