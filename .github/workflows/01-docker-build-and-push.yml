@@ -23,6 +23,8 @@ jobs:
               run: docker run -d --rm -p 8080:80 $DOCKER_IMAGE_NAME
 
             - name: Test container
-              run: curl --fail http://localhost:8080
+              run: |
+                sleep 2
+                curl --fail http://localhost:8080
 
     
