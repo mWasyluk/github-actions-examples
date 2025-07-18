@@ -8,6 +8,7 @@ on:
 env:
     MODULE_PATH: ./01-docker-build-and-push
     DOCKER_IMAGE_NAME: "github-actions-examples:01-docker-build-and-push"
+    NGINX_RESPONSE_STRING: "Hello, World!"
 
 jobs: 
     build:
@@ -25,6 +26,6 @@ jobs:
             - name: Test container
               run: |
                 sleep 2
-                curl --fail http://localhost:8080
+                curl -s http://localhost:8080 | grep -q $NGINX_RESPONSE_STRING
 
     
