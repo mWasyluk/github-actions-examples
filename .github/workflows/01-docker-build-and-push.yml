@@ -2,7 +2,6 @@ name: 01-docker-build-and-push
 
 on: 
     push:
-        branches: [main]
         paths: 
             - "**01-docker-build-and-push**"
 
