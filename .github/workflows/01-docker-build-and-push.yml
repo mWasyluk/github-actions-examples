@@ -31,6 +31,7 @@ jobs:
             - name: Tag image
               run: |
                 echo "DOCKER_FULL_IMAGE_NAME=${{secrets.DOCKER_USER}}/$DOCKER_IMAGE_NAME" >> $GITHUB_ENV
+                echo $DOCKER_FULL_IMAGE_NAME
                 docker tag $DOCKER_IMAGE_NAME $DOCKER_FULL_IMAGE_NAME
 
             - name: Login do DockerHub
