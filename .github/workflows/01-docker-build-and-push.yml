@@ -7,7 +7,7 @@ on:
 
 env:
     MODULE_PATH: ./01-docker-build-and-push
-    DOCKER_IMAGE_NAME: "mwas0122/github-actions-examples:01-docker-build-and-push"
+    DOCKER_IMAGE_NAME: "github-actions-examples:01-docker-build-and-push"
 
 jobs: 
     build:
@@ -15,16 +15,14 @@ jobs:
         steps:
             - name: Checkout
               uses: actions/checkout@v4
+
             - name: Build image
               run: docker build -t $DOCKER_IMAGE_NAME $MODULE_PATH
 
-    test:
-        needs: [build]
-        runs-on: ubuntu-latest
-        steps:
             - name: Run container
               run: docker run -d --rm -p 8080:80 $DOCKER_IMAGE_NAME
 
             - name: Test container
               run: curl --fail http://localhost:8080
+
     
