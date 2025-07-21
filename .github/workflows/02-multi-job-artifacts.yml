@@ -16,7 +16,7 @@ jobs:
             - name: Fetch data
               uses: actions/checkout@v4
               with: 
-                path: 02-multi-job-artifacts
+                filter: "02-multi-job-artifacts**"
 
             - name: Display content
               run: |
@@ -30,23 +30,13 @@ jobs:
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
-                path: ${PROJECT_DIR}
+                filter: "$PROJECT_DIR**"
             
             - name: Display content again
               run: |
                 echo $(pwd)
                 ls 
-                ls ${PROJECT_DIR}
-
-            - name: Remove checkout result
-              run: rm -rf ${PROJECT_DIR}
-
-            - name: Checkout again without path prop
-              uses: actions/checkout@v4
-            
-            - name: Display content again
-              run: |
-                echo $(pwd)
-                ls 
+                ls $PROJECT_DIR
+                ls 02-multi-job-artifacts
 
 
