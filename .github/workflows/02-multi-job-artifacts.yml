@@ -22,5 +22,31 @@ jobs:
               run: |
                 echo $(pwd)
                 ls 
+                ls 02-multi-job-artifacts
+            
+            - name: Remove checkout result
+              run: rm -rf 02-multi-job-artifacts
+
+            - name: Checkout again with placeholder path
+              uses: actions/checkout@v4
+              with: 
+                path: ${PROJECT_DIR}
+            
+            - name: Display content again
+              run: |
+                echo $(pwd)
+                ls 
+                ls ${PROJECT_DIR}
+
+            - name: Remove checkout result
+              run: rm -rf ${PROJECT_DIR}
+
+            - name: Checkout again without path prop
+              uses: actions/checkout@v4
+            
+            - name: Display content again
+              run: |
+                echo $(pwd)
+                ls 
 
 
