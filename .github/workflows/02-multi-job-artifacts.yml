@@ -24,14 +24,14 @@ jobs:
             - name: Display content
               run: |
                 cd $PROJECT_DIR
-                chmod +x mnv/mvnw
+                chmod +x mvn/mvnw
                 mvn/mvnw clean package
 
             - name: Upload artifact
               uses: actions/upload-artifact@v4
               with: 
                 name: build
-                path: $PROJECT_DIR/target/*.jar
+                path: 02-multi-job-artifacts/target/*.jar
                 overwrite: true
                   
     run:
