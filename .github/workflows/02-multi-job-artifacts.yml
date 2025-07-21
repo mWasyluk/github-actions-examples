@@ -7,44 +7,39 @@ on:
             - "!**README.md"
 
 env: 
-    PROJECT_DIR: "02-multi-job-artifacts"
+    PROJECT_DIR: 02-multi-job-artifacts
+    ARTIFACT_NAME: build
 
 jobs:
-    sparse-checkout-no-cone-mode:
+    build-jar:
         runs-on: ubuntu-latest
         steps: 
             - name: Fetch data
               uses: actions/checkout@v4
               with: 
                 sparse-checkout: |
-                  01-docker-build-and-push/Dockerfile
                   02-multi-job-artifacts
                 sparse-checkout-cone-mode: false
 
             - name: Display content
               run: |
-                ls 
-                echo "====================="
-                ls 01-docker-build-and-push
-                echo "====================="
-                ls 02-multi-job-artifacts
-            
-    sparse-checkout-cone-mode:
+                cd $PROJECT_DIR
+                mvn/mvnw clean package
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v4
+              with: 
+                name: build
+                path: $PROJECT_DIR/target/*.jar
+                overwrite: true
+                  
+    run:
         runs-on: ubuntu-latest
         steps:
-            - name: Fetch data
-              uses: actions/checkout@v4
+            - name: Download artifact
+              uses: actions/download-artifact@v4
               with: 
-                sparse-checkout: |
-                  01-docker-build-and-push/Dockerfile
-                  02-multi-job-artifacts
-            
-            - name: Display content
-              run: |
-                ls 
-                echo "====================="
-                ls 01-docker-build-and-push
-                echo "====================="
-                ls 02-multi-job-artifacts
+                name: build
 
-
+            - name: Run application
+              run: java -jar *.jar
