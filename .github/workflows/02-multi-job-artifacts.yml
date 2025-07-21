@@ -38,7 +38,7 @@ jobs:
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
-                sparse-checkout: 
+                sparse-checkout: |
                     02-multi-job-artifacts
                     README.md
                     01-docker-build-and-push/Dockerfile
