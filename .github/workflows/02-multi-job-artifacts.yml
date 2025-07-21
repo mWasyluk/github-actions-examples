@@ -24,6 +24,7 @@ jobs:
             - name: Display content
               run: |
                 cd $PROJECT_DIR
+                ls -l mvn/
                 mvn/mvnw clean package
 
             - name: Upload artifact
