@@ -1,0 +1,17 @@
+name: 02-multi-job-artifacts
+
+on: 
+    push:
+        paths:
+            - "**02-multi-job-artifacts**"
+            - "!**README.md"
+
+jobs:
+    build-jar:
+        runs-on: ubuntu-latest
+        steps: 
+            - name: Display path to Java
+              run: echo $JAVA_HOME
+
+            - name: Display Java version
+              run: java -version
