@@ -16,7 +16,7 @@ jobs:
             - name: Fetch data
               uses: actions/checkout@v4
               with: 
-                path: $PROJECT_DIR
+                path: 02-multi-job-artifacts
 
             - name: Display content
               run: |
