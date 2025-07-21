@@ -17,38 +17,34 @@ jobs:
               uses: actions/checkout@v4
               with: 
                 sparse-checkout: |
+                  01-docker-build-and-push/Dockerfile
                   02-multi-job-artifacts
-                  00-playground
                 sparse-checkout-cone-mode: false
 
             - name: Display content
               run: |
-                echo $(pwd)
                 ls 
                 echo "====================="
-                ls 02-multi-job-artifacts
+                ls 01-docker-build-and-push
                 echo "====================="
-                ls 00-playground
+                ls 02-multi-job-artifacts
             
     sparse-checkout-cone-mode:
         runs-on: ubuntu-latest
         steps:
-            - name: Checkout again with placeholder path
+            - name: Fetch data
               uses: actions/checkout@v4
               with: 
                 sparse-checkout: |
-                    02-multi-job-artifacts
-                    README.md
-                    01-docker-build-and-push/Dockerfile
-                sparse-checkout-cone-mode: true
+                  01-docker-build-and-push/Dockerfile
+                  02-multi-job-artifacts
             
-            - name: Display content again
+            - name: Display content
               run: |
-                echo $(pwd)
                 ls 
                 echo "====================="
-                ls 02-multi-job-artifacts
-                echo "====================="
                 ls 01-docker-build-and-push
+                echo "====================="
+                ls 02-multi-job-artifacts
 
 
