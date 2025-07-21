@@ -17,26 +17,30 @@ jobs:
               uses: actions/checkout@v4
               with: 
                 sparse-checkout: "02-multi-job-artifacts"
+                filter: "blob:none"
 
             - name: Display content
               run: |
                 echo $(pwd)
                 ls 
+                echo "==="
                 ls 02-multi-job-artifacts
             
             - name: Remove checkout result
-              run: rm -rf 02-multi-job-artifacts
+              run: |
+                rm -rf ./*
+                ls
 
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
-                sparse-checkout: "$PROJECT_DIR"
+                sparse-checkout: "02-multi-job-artifacts"
             
             - name: Display content again
               run: |
                 echo $(pwd)
                 ls 
-                ls $PROJECT_DIR
+                echo "==="
                 ls 02-multi-job-artifacts
 
 
