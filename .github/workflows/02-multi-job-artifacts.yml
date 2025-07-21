@@ -18,3 +18,6 @@ jobs:
 
             - name: Display all paths to Java
               run: ls /usr/lib/jvm/
+
+            - name: Display all env vars
+              run: printenv
