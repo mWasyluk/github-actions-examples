@@ -16,7 +16,7 @@ jobs:
             - name: Fetch data
               uses: actions/checkout@v4
               with: 
-                filter: "02-multi-job-artifacts**"
+                sparse-checkout: "02-multi-job-artifacts**"
 
             - name: Display content
               run: |
@@ -30,7 +30,7 @@ jobs:
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
-                filter: "$PROJECT_DIR**"
+                sparse-checkout: "$PROJECT_DIR**"
             
             - name: Display content again
               run: |
