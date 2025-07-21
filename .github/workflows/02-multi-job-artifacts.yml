@@ -10,7 +10,7 @@ env:
     PROJECT_DIR: "02-multi-job-artifacts"
 
 jobs:
-    build-jar:
+    sparse-checkout-no-cone-mode:
         runs-on: ubuntu-latest
         steps: 
             - name: Fetch data
@@ -30,11 +30,9 @@ jobs:
                 echo "====================="
                 ls 00-playground
             
-            - name: Remove checkout result
-              run: |
-                rm -rf ./*
-                ls
-
+    sparse-checkout-cone-mode:
+        runs-on: ubuntu-latest
+        steps:
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
