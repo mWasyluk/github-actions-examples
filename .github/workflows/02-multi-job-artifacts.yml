@@ -25,8 +25,10 @@ jobs:
               run: |
                 echo $(pwd)
                 ls 
-                echo "==="
+                echo "====================="
                 ls 02-multi-job-artifacts
+                echo "====================="
+                ls 00-playground
             
             - name: Remove checkout result
               run: |
@@ -36,14 +38,19 @@ jobs:
             - name: Checkout again with placeholder path
               uses: actions/checkout@v4
               with: 
-                sparse-checkout: "02-multi-job-artifacts"
+                sparse-checkout: 
+                    02-multi-job-artifacts
+                    README.md
+                    01-docker-build-and-push/Dockerfile
                 sparse-checkout-cone-mode: true
             
             - name: Display content again
               run: |
                 echo $(pwd)
                 ls 
-                echo "==="
+                echo "====================="
                 ls 02-multi-job-artifacts
+                echo "====================="
+                ls 01-docker-build-and-push
 
 
