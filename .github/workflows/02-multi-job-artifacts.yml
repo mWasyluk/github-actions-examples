@@ -17,7 +17,7 @@ jobs:
               uses: actions/checkout@v4
               with: 
                 sparse-checkout: "02-multi-job-artifacts"
-                filter: "blob:none"
+                sparse-checkout-cone-mode: false
 
             - name: Display content
               run: |
