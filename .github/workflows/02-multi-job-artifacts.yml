@@ -21,3 +21,9 @@ jobs:
 
             - name: Display all env vars
               run: printenv
+
+    print-all-vars-linux:
+        runs-on: linux-latest
+        steps:
+            - name: Print all vars
+              run: printenv
