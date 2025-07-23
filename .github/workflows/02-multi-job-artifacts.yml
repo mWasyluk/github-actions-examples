@@ -78,9 +78,10 @@ jobs:
         run: docker cp ${{ env.APP_JAR_NAME }} ${{ env.JDK_CONTAINER_NAME }}:${{ env.JDK_CONTAINER_WORKDIR }}
 
       - name: Create image based on running container
-        run: docker commit \
-          --change='CMD ['java', '-jar', '${{ env.APP_JAR_NAME }}']' \
-          ${{ env.JDK_CONTAINER_NAME }} ${{ env.JDK_CONTAINER_NAME }}
+        run: |
+          docker commit \
+            --change='CMD ['java', '-jar', '${{ env.APP_JAR_NAME }}']' \
+            ${{ env.JDK_CONTAINER_NAME }} ${{ env.JDK_CONTAINER_NAME }}
 
       - name: Save image to tar
         run: docker save -o "${{ env.ARTIFACT_IMAGE_NAME}}.tar" ${{ env.JDK_CONTAINER_NAME }}
