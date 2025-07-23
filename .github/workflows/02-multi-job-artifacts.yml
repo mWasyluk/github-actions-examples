@@ -59,7 +59,7 @@ jobs:
     needs: [java-run-and-test]
     steps:
       - name: Run JRE image
-        run: docker start -d \
+        run: docker run -d \
           -w $JDK_CONTAINER_WORKDIR \
           --name $JDK_CONTAINER_NAME \
           $JDK_IMAGE_NAME:$JDK_IMAGE_TAG
