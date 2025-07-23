@@ -65,9 +65,9 @@ jobs:
       - name: Run JRE image
         run: |
           docker run -d \
-          -w ${{ env.JDK_CONTAINER_WORKDIR }} \
-          --name ${{ env.JDK_CONTAINER_NAME }} \
-          ${{ env.JDK_IMAGE_NAME }}:${{ env.JDK_IMAGE_TAG }}
+            -w ${{ env.JDK_CONTAINER_WORKDIR }} \
+            --name ${{ env.JDK_CONTAINER_NAME }} \
+            ${{ env.JDK_IMAGE_NAME }}:${{ env.JDK_IMAGE_TAG }}
 
       - name: Download build artifact
         uses: actions/download-artifact@v4
