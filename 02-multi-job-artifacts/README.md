@@ -49,4 +49,4 @@ mvn
 pom.xml
 src
 ```
-
+- `actions/upload-artifact@v4` tworzy wydzieloną przestrzeń na artefakty dla każdego uruchomienia workflow. Dopóki w jednym workflow nie ma deklaracji tej samej nazwy artefaktu błąd conflict nie zostanie rzucony, a określanie `with.overwrite: true` nie ma zastosowania.

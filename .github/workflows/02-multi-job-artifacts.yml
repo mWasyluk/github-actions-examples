@@ -1,47 +1,108 @@
 name: 02-multi-job-artifacts
 
 on: 
-    push:
-        paths:
-            - "**02-multi-job-artifacts**"
-            - "!**README.md"
+  push:
+    paths:
+      - "**02-multi-job-artifacts**"
+      - "!**README.md"
 
 env: 
-    PROJECT_DIR: 02-multi-job-artifacts
-    ARTIFACT_NAME: build
+  PROJECT_DIR: 02-multi-job-artifacts
+  JDK_CONTAINER_WORKDIR: /app
+  JDK_CONTAINER_NAME: app-container
+  JDK_IMAGE_NAME: eclipse-temurin
+  JDK_IMAGE_TAG: 11-jre-alpine
 
 jobs:
-    build-jar:
-        runs-on: ubuntu-latest
-        steps: 
-            - name: Fetch data
-              uses: actions/checkout@v4
-              with: 
-                sparse-checkout: |
-                  02-multi-job-artifacts
-                sparse-checkout-cone-mode: false
+  maven-build-jar:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Fetch data
+        uses: actions/checkout@v4
+        with: 
+          sparse-checkout: |
+            02-multi-job-artifacts
+          sparse-checkout-cone-mode: false
 
-            - name: Build JAR package
-              run: |
-                cd $PROJECT_DIR
-                chmod +x mvn/mvnw
-                mvn/mvnw clean package
+      - name: Build JAR package
+        run: |
+          cd $PROJECT_DIR
+          chmod +x mvn/mvnw
+          mvn/mvnw clean package
 
-            - name: Upload artifact
-              uses: actions/upload-artifact@v4
-              with: 
-                name: build
-                path: 02-multi-job-artifacts/target/*.jar
-                # overwrite: true
-                  
-    run:
-        runs-on: ubuntu-latest
-        needs: build-jar
-        steps:
-            - name: Download artifact
-              uses: actions/download-artifact@v4
-              with: 
-                name: build
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with: 
+          name: build
+          path: 02-multi-job-artifacts/target/*.jar
+                
+  java-run-and-test:
+    runs-on: ubuntu-latest
+    needs: maven-build-jar
+    steps:
+        - name: Download artifact
+          uses: actions/download-artifact@v4
+          with: 
+            name: build
 
-            - name: Run application
-              run: java -jar *.jar
+        - name: Set up JDK 11
+          uses: actions/setup-java@v4
+          with:
+            java-version: '11'
+            distribution: 'temurin'
+
+        - name: Run application
+          run: java -jar *.jar | grep -q "Hello"
+
+  docker-image-create-and-push:
+    runs-on: ubuntu-latest
+    needs: [java-run-and-test]
+    steps:
+      - name: Run JRE image
+        run: docker start -d \
+          -w $JDK_CONTAINER_WORKDIR \
+          --name $JDK_CONTAINER_NAME \
+          $JDK_IMAGE_NAME:$JDK_IMAGE_TAG
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: build
+
+      - name: Display working dir content
+        run: ls -a
+
+      - name: Copy build to container
+        run: docker cp *.jar $JDK_CONTAINER_NAME:$JDK_CONTAINER_WORKDIR
+
+      - name: Create image based on running container
+        run: docker commit \
+          --change='CMD ['java', '-jar', '*.jar']' \
+          $JDK_CONTAINER_NAME $JDK_CONTAINER_NAME
+
+      - name: Save image to tar
+        run: docker save -o $JDK_CONTAINER_NAME.tar $JDK_CONTAINER_NAME
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: image
+          path: "*.tar"
+        
+  docker-push-image:
+    runs-on: ubuntu-latest
+    needs: docker-image-create-and-push
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: image
+
+      - name: Get repository name
+        run: echo "REPO_NAME=${${{github.repository}}#*\}" >> $GITHUB_ENV
+
+      - name: Login and push to DockerHub
+        run: |
+          echo ${{secrets.DOCKER_TOKEN}} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+          docker tag 
+          docker push $JDK_CONTAINER_NAME ${{secrets.DOCKER_USER}}\$REPO_NAME:$PROJECT_DIR
