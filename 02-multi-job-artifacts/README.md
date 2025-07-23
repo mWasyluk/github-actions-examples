@@ -3,7 +3,8 @@
 ## 📝 NOTES
 - runner `ubuntu-latest` zawiera 4 wersje JVM i wszystkie mają w systemie ustawione zmienne środowiskowe wskazujące lokalizację JDK: `JAVA_HOME_[8|11|17|21]_X64` ( wersja `11` jest domyślną i przypisaną również do zmiennej `JAVA_HOME`). Wszystkie wersje są dostępne w katalogu `/usr/lib/jvm/`.
 - Maven is not intalled by default so it is convinient to provide Maven Wrapper to the project before pushing it to a repository. It can be easily done with the `mvn -N wrapper:wrapper` command.
-- `jobs.<>.steps.<>.with` nie pozwala na użycie environment variables
+- `jobs.<>.steps.<>.with` nie pozwala na użycie environment variables poprzez `${ENV_NAME}`, a poprzez `${{env.ENV_NAME}}`
+- W YAML worflowu, shell-style var syntax `$VAR` jest obsługiwany tylko wewnątrz klucza `run` kroku, ponieważ tylko ten fragment jest przekazywany do shella. Wszędzie indziej, np. `step[*].with` lub `env`, używaj GitHub Actions expression do pobrania wartości zmiennej z contextu `env`, np. `${{ env.VAR }} `. Zmienne zapisane poprzez `echo "VAR=val" >> $GITHUB_ENV` również mogą zostać wstrzyknięte w ten sposób.
 - W `actions/checkout@v4` możliwe jest pobranie konkretnych plików lub katalogów wewnątrz katalogu root repozytorium docelowego (domyślnie `${{github.repository}}` lub określonego w `...with.repository` property). W tym celu należy określić ścieżki plików / katalogów in the `...with.sparse-checkout` property (każda w nowej linii) oraz ustawić `...with.sparse-checkout-cone-mode` property na `false` (nie pobiera sąsiednich blobów). Na przykład: 
 ```yaml
 - name: Fetch data
