@@ -92,7 +92,7 @@ jobs:
         
   docker-push-image:
     runs-on: ubuntu-latest
-    needs: docker-image-create-and-push
+    needs: docker-create-image
     steps:
       - name: Download image artifact
         uses: actions/download-artifact@v4
