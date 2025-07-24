@@ -31,7 +31,6 @@ jobs:
       - name: Build JAR package
         run: |
           cd ${{ env.PROJECT_DIR }}
-          chmod +x mvn/mvnw
           mvn clean package
 
       - name: Upload artifact
