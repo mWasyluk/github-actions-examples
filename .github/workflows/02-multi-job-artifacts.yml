@@ -35,6 +35,7 @@ jobs:
 
       - name: Verify jar absence
         run: ls target/
+        continue-on-error: true
 
       - name: Build JAR package
         run: |
