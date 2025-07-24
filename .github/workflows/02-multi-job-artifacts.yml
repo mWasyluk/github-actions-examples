@@ -23,21 +23,27 @@ jobs:
     steps: 
       - name: Check version
         run: mvn -v
-  # maven-build-jar:
-  #   runs-on: ubuntu-latest
-  #   steps: 
-  #     - name: Fetch data
-  #       uses: actions/checkout@v4
-  #       with: 
-  #         sparse-checkout: |
-  #           ${{ env.PROJECT_DIR }}
-  #         sparse-checkout-cone-mode: false
+  maven-build-jar:
+    runs-on: ubuntu-latest
+    steps: 
+      - name: Fetch data
+        uses: actions/checkout@v4
+        with: 
+          sparse-checkout: |
+            ${{ env.PROJECT_DIR }}
+          sparse-checkout-cone-mode: false
 
-  #     - name: Build JAR package
-  #       run: |
-  #         cd ${{ env.PROJECT_DIR }}
-  #         chmod +x mvn/mvnw
-  #         mvn/mvnw clean package
+      - name: Verify jar absence
+        run: ls target/
+
+      - name: Build JAR package
+        run: |
+          cd ${{ env.PROJECT_DIR }}
+          chmod +x mvn/mvnw
+          mvn clean package
+
+      - name: Verify jar presence
+        run: ls target/
 
   #     - name: Upload artifact
   #       uses: actions/upload-artifact@v4
