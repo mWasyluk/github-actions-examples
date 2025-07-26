@@ -31,6 +31,8 @@ jobs:
           pwd
           echo "============="
           ls -a
+          echo "============="
+          ls -a ${{ env.MODULE_DIR }}
 
       - name: Execute remote SSH script using SSH key
         uses: appleboy/ssh-action@v1
