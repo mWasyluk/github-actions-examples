@@ -14,6 +14,7 @@ env:
   MODULE_DIR: 03-deploy-via-ssh
   CONTAINER_NAME: nginx-cont  
   IMAGE_NAME: nginx:stable-alpine
+  CONTAINER_PORT: 8081
 
 jobs:
   test-connection:
@@ -34,6 +35,7 @@ jobs:
             echo 'SCRIPT<<EOF'
             echo export CONTAINER_NAME=${{ env.CONTAINER_NAME }}
             echo export IMAGE_NAME=${{ env.IMAGE_NAME }}
+            echo export CONTAINER_PORT=${{ env.CONTAINER_PORT }}
             cat ${{ env.MODULE_DIR }}/deploy.sh
             echo EOF
           } >> "$GITHUB_ENV"
