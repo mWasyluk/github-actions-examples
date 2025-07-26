@@ -27,6 +27,11 @@ jobs:
           sparse-checkout: ${{ env.MODULE_DIR }}
           sparse-checkout-cone-mode: false
 
+      - run: |
+          pwd
+          echo "============="
+          ls -a
+
       - name: Execute remote SSH script using SSH key
         uses: appleboy/ssh-action@v1
         with:
