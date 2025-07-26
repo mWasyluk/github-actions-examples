@@ -2,6 +2,8 @@
 
 Learn how to **deploy a built Docker image on a remote server** via SSH with the help of the `appleboy/ssh-action@v1` action.
 
+> The result of this module is served on [https://github-actions-examples.**mwasyluk.pl**/module-03/](https://github-actions-examples.mwasyluk.pl/module-03/)
+
 ## 📋 Table of Contents
 - [🔑 Key Learnings](#-key-learnings)
 - [🚀 Workflow Description](#-workflow-description)
