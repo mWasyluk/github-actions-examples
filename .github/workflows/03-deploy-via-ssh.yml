@@ -12,23 +12,29 @@ on:
 
 env: 
   MODULE_DIR: 03-deploy-via-ssh
-  CONTAINER_NAME: nginx-cont  
-  IMAGE_NAME: nginx:stable-alpine
+  CONTAINER_NAME: github-actions-examples-03
+  IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:03-deploy-via-ssh
   CONTAINER_PORT: 8081
 
 jobs:
-  test-connection:
-    name: Test connection
+  build-image:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Fetch module files
+      - name: Fetch the module files
         uses: actions/checkout@v4
         with: 
           sparse-checkout: ${{ env.MODULE_DIR }}
           sparse-checkout-cone-mode: false
 
-      - name: Copy deploy script to variable
+      - name: Build and push a container
+        run: |
+          cd ${{ env.MODULE_DIR }}
+          docker build -t ${{ env.IMAGE_NAME }} .
+          echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+          docker push ${{ env.IMAGE_NAME }} 
+
+      - name: Copy the deploy script to a variable
         if: ${{ !github.event.inputs.script }}
         run: |
           {
@@ -40,7 +46,7 @@ jobs:
             echo EOF
           } >> "$GITHUB_ENV"
 
-      - name: Execute remote SSH script using SSH key
+      - name: Deploy on the server via SSH
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.MIKRUS_HOST }}
