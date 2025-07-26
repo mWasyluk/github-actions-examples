@@ -30,7 +30,11 @@ jobs:
       - name: Copy deploy script to variable
         if: ${{ !github.event.inputs.script }}
         run: |
-          echo "SCRIPT='`cat ${{ env.MODULE_DIR }}/deploy.sh`'" >> $GITHUB_ENV
+          {
+            echo 'SCRIPT<<EOF'
+            cat ${{ env.MODULE_DIR }}/deploy.sh
+            echo EOF
+          } >> "$GITHUB_ENV"
 
       - name: Execute remote SSH script using SSH key
         uses: appleboy/ssh-action@v1
