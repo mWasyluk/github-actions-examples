@@ -7,22 +7,31 @@ on:
       - "!**README.md"
   workflow_dispatch:
     inputs:
-      command:
-        description: Command to execute on the remote server
-        default: | 
-          whoami
-          ls -al
+      script:
+        description: Script to execute on the remote server
+
+env: 
+  MODULE_DIR: 03-deploy-via-ssh
+  CONTAINER_NAME: nginx-cont  
+  IMAGE_NAME: nginx:stable-alpine
 
 jobs:
   test-connection:
     name: Test connection
     runs-on: ubuntu-latest
+
     steps:
-      - name: Execute remote SSH commands using SSH key
+      - name: Fetch module files
+        uses: actions/checkout@v4
+        with: 
+          sparse-checkout: ${{ env.MODULE_DIR }}
+          sparse-checkout-cone-mode: false
+
+      - name: Execute remote SSH script using SSH key
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.MIKRUS_HOST }}
           username: ${{ secrets.MIKRUS_USER }}
           key: ${{ secrets.MIKRUS_KEY }}
           port: ${{ secrets.MIKRUS_PORT }}
-          script: ${{ github.event.inputs.command }}
+          script: ${{ github.event.inputs.script || format('{0}/deploy.sh', env.MODULE_DIR) }}
