@@ -1,0 +1,23 @@
+name: 03-deploy-via-ssh
+
+on:
+  push:
+    paths: |
+      "**03-deploy-via-ssh**"
+      "!**README.md"
+
+jobs:
+  test-connection:
+    name: Test connection
+    runs-on: ubuntu-latest
+    steps:
+      - name: Execute remote SSH commands using SSH key
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.MIKRUS_HOST }}
+          username: ${{ secrets.MIKRUS_USER }}
+          key: ${{ secrets.MIKRUS_KEY }}
+          port: ${{ secrets.MIKRUS_PORT }}
+          script: |
+            whoami
+            ls -al
