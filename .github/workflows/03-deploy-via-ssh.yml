@@ -1,0 +1,58 @@
+name: 03-deploy-via-ssh
+
+on:
+  push:
+    paths:
+      - "**03-deploy-via-ssh**"
+      - "!**README.md"
+  workflow_dispatch:
+    inputs:
+      script:
+        description: Script to execute on the remote server
+
+env: 
+  MODULE_DIR: 03-deploy-via-ssh
+  CONTAINER_NAME: github-actions-examples-03
+  IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:03-deploy-via-ssh
+  CONTAINER_PORT: 8081
+
+jobs:
+  build-image:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch the module files
+        if: ${{ !github.event.inputs.script }}
+        uses: actions/checkout@v4
+        with: 
+          sparse-checkout: ${{ env.MODULE_DIR }}
+          sparse-checkout-cone-mode: false
+
+      - name: Build and push a container
+        if: ${{ !github.event.inputs.script }}
+        run: |
+          cd ${{ env.MODULE_DIR }}
+          docker build -t ${{ env.IMAGE_NAME }} .
+          echo ${{ secrets.DOCKER_TOKEN }} | docker login -u ${{secrets.DOCKER_USER}} --password-stdin
+          docker push ${{ env.IMAGE_NAME }} 
+
+      - name: Copy the deploy script to a variable
+        if: ${{ !github.event.inputs.script }}
+        run: |
+          {
+            echo 'SCRIPT<<EOF'
+            echo export CONTAINER_NAME=${{ env.CONTAINER_NAME }}
+            echo export IMAGE_NAME=${{ env.IMAGE_NAME }}
+            echo export CONTAINER_PORT=${{ env.CONTAINER_PORT }}
+            cat ${{ env.MODULE_DIR }}/deploy.sh
+            echo EOF
+          } >> "$GITHUB_ENV"
+
+      - name: Deploy on the server via SSH
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.MIKRUS_HOST }}
+          username: ${{ secrets.MIKRUS_USER }}
+          key: ${{ secrets.MIKRUS_KEY }}
+          port: ${{ secrets.MIKRUS_PORT }}
+          script: ${{ github.event.inputs.script || env.SCRIPT }}
