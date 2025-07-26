@@ -2,9 +2,9 @@ name: 03-deploy-via-ssh
 
 on:
   push:
-    paths: |
-      "**03-deploy-via-ssh**"
-      "!**README.md"
+    paths:
+      - "**03-deploy-via-ssh**"
+      - "!**README.md"
 
 jobs:
   test-connection:
