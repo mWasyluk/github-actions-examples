@@ -32,6 +32,8 @@ jobs:
         run: |
           {
             echo 'SCRIPT<<EOF'
+            export CONTAINER_NAME=${{ env.CONTAINER_NAME }}
+            export IMAGE_NAME=${{ env.IMAGE_NAME }}
             cat ${{ env.MODULE_DIR }}/deploy.sh
             echo EOF
           } >> "$GITHUB_ENV"
