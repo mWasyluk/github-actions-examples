@@ -5,6 +5,13 @@ on:
     paths:
       - "**03-deploy-via-ssh**"
       - "!**README.md"
+  workflow_dispatch:
+    inputs:
+      command:
+        description: Command to execute on the remote server
+        default: | 
+          whoami
+          ls -al
 
 jobs:
   test-connection:
@@ -18,6 +25,4 @@ jobs:
           username: ${{ secrets.MIKRUS_USER }}
           key: ${{ secrets.MIKRUS_KEY }}
           port: ${{ secrets.MIKRUS_PORT }}
-          script: |
-            whoami
-            ls -al
+          script: ${{ github.event.inputs.command }}
