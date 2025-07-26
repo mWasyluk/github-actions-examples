@@ -22,12 +22,14 @@ jobs:
 
     steps:
       - name: Fetch the module files
+        if: ${{ !github.event.inputs.script }}
         uses: actions/checkout@v4
         with: 
           sparse-checkout: ${{ env.MODULE_DIR }}
           sparse-checkout-cone-mode: false
 
       - name: Build and push a container
+        if: ${{ !github.event.inputs.script }}
         run: |
           cd ${{ env.MODULE_DIR }}
           docker build -t ${{ env.IMAGE_NAME }} .
