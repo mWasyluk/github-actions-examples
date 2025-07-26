@@ -15,4 +15,5 @@
 </pre>
 
 ## 📝 Notes
-- 
+- `appleboy/ssh-action@v1` executes `sripts` input on the remote server so passing there a file dir that is present on the runner causes the 'not found' error.
+

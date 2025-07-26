@@ -27,12 +27,10 @@ jobs:
           sparse-checkout: ${{ env.MODULE_DIR }}
           sparse-checkout-cone-mode: false
 
-      - run: |
-          pwd
-          echo "============="
-          ls -a
-          echo "============="
-          ls -a ${{ env.MODULE_DIR }}
+      - name: Copy deploy script to variable
+        if: ${{ !github.event.inputs.script }}
+        run: |
+          echo "SCRIPT=`cat ${{ env.MODULE_DIR }}/deploy.sh`" >> $GITHUB_ENV
 
       - name: Execute remote SSH script using SSH key
         uses: appleboy/ssh-action@v1
@@ -41,4 +39,4 @@ jobs:
           username: ${{ secrets.MIKRUS_USER }}
           key: ${{ secrets.MIKRUS_KEY }}
           port: ${{ secrets.MIKRUS_PORT }}
-          script: ${{ github.event.inputs.script || format('{0}/{1}/deploy.sh', github.workspace , env.MODULE_DIR) }}
+          script: ${{ github.event.inputs.script || env.SCRIPT }}
