@@ -1,0 +1,29 @@
+name: 04-cache-dependencies
+
+on:
+  push:
+    paths:
+      - "**04-cache-dependencies**"
+      - "**README.md"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # - name: Checkout module files
+      #   uses: actions/checkout@v4
+      #   with:
+      #     sparse-checkout: "04-cache-dependencies"
+      #     sparse-checkout-cone-mode: false
+
+      # - name: Config cache mandagement
+      #   uses: actions/cache@v4
+      #   with: 
+
+      - name: Verify docker cache
+        run: |
+          ls ${{ runner.temp }}
+          echo "==========================="
+          ls ${{ runner.temp }}/.buildx-cache
+
