@@ -21,8 +21,19 @@ jobs:
       #   uses: actions/cache@v4
       #   with: 
 
+      - name: Build simple docker compose file
+        run: |
+          cat >> docker-compose.yml<<EOF
+          services:
+            test: 
+              image: nginx:stable-alpine3.21
+          EOF
+
       - name: Run some docker image
-        run: docker run --rm -d nginx:stable-alpine3.21
+        run: docker compose up
+
+      - name: Sleep
+        run: sleep 5s
 
       - name: Verify docker cache
         run: |
