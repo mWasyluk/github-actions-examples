@@ -4,7 +4,7 @@ on:
   push:
     paths:
       - "**04-cache-dependencies**"
-      - "**README.md"
+      - "!**README.md"
 
 jobs:
   build:
@@ -20,6 +20,9 @@ jobs:
       # - name: Config cache mandagement
       #   uses: actions/cache@v4
       #   with: 
+
+      - name: Run some docker image
+        run: docker run --rm -d nginx:stable-alpine3.21
 
       - name: Verify docker cache
         run: |
