@@ -30,7 +30,7 @@ jobs:
           EOF
 
       - name: Run some docker image
-        run: docker compose up -d .
+        run: docker compose up -d
 
       - name: Sleep
         run: sleep 5s
