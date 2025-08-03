@@ -27,13 +27,11 @@ jobs:
           services:
             test: 
               image: nginx:stable-alpine3.21
+              cache_to: type=local,dest=${{ runner.temp }}/.buildx-cache
           EOF
 
       - name: Run some docker image
         run: docker compose up -d
-
-      - name: Sleep
-        run: sleep 5s
 
       - name: Verify docker cache
         run: |
