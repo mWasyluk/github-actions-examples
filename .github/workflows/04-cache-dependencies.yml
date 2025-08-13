@@ -23,7 +23,7 @@ jobs:
           cat > Dockerfile<<EOF
           FROM nginx:stable-alpine3.21
           WORKDIR /test
-          RUN echo "test" > test.txt
+          RUN echo "testv2" > test.txt
           EOF
       
       - name: Config cache mandagement
@@ -45,5 +45,3 @@ jobs:
             --load \
             -t some:image \
             .
-
-
