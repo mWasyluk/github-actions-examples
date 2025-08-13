@@ -17,28 +17,33 @@ jobs:
       #   with:
       #     sparse-checkout: "04-cache-dependencies"
       #     sparse-checkout-cone-mode: false
-
-      # - name: Config cache mandagement
-      #   uses: actions/cache@v4
-      #   with: 
       
+      - name: Create a simple Dockerfile
+        run: |
+          cat > Dockerfile<<EOF
+          FROM nginx:stable-alpine3.21
+          WORKDIR /test
+          RUN echo "test" > test.txt
+          EOF
+      
+      - name: Config cache mandagement
+        uses: actions/cache@v4
+        with: 
+          path: ${{ runner.temp }}/.buildx-cache
+          key: ${{ runner.os }}/.buildx-${{ hashFiles('Dockerfile') }}
+          restore-keys: |
+            ${{ runner.os }}/.buildx-
+        
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build simple Dockerfile
-        run: |
-          cat >> Dockerfile<<EOF
-          FROM nginx:stable-alpine3.21
-          WORKDIR /test
-          RUN echo "test" >> test.txt
-          EOF
+      - name: Build the Dockerfile
+        run: | 
+          docker buildx build \
+            --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache \
+            --cache-from=type=local,src=${{ runner.temp }}/.buildx-cache \
+            --load \
+            -t some:image \
+            .
 
-      - name: Run some docker image
-        run: docker build --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache .
-
-      - name: Verify docker cache
-        run: |
-          ls ${{ runner.temp }}
-          echo "==========================="
-          ls ${{ runner.temp }}/.buildx-cache
 
