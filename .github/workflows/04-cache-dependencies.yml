@@ -5,6 +5,7 @@ on:
     paths:
       - "**04-cache-dependencies**"
       - "!**README.md"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -20,18 +21,20 @@ jobs:
       # - name: Config cache mandagement
       #   uses: actions/cache@v4
       #   with: 
+      
+      # - name: Set up Docker Buildx
+      #   uses: docker/setup-buildx-action@v3
 
-      - name: Build simple docker compose file
+      - name: Build simple Dockerfile
         run: |
-          cat >> docker-compose.yml<<EOF
-          services:
-            test: 
-              image: nginx:stable-alpine3.21
-              cache_to: type=local,dest=${{ runner.temp }}/.buildx-cache
+          cat >> Dockerfile<<EOF
+          FROM nginx:stable-alpine3.21
+          WORKDIR /test
+          RUN echo "test" >> test.txt
           EOF
 
       - name: Run some docker image
-        run: docker compose up -d
+        run: docker build --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache .
 
       - name: Verify docker cache
         run: |
