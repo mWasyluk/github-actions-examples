@@ -34,7 +34,7 @@ jobs:
           EOF
 
       - name: Run some docker image
-        run: docker buildx build --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache .
+        run: docker build --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache .
 
       - name: Verify docker cache
         run: |
