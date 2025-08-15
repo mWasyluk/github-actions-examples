@@ -3,16 +3,8 @@ API_CONT_NAME=todosapp-api
 APP_CONT_NAME=todosapp-app
 DB_CONT_NAME=${TODOSAPP_DB_NAME:=todosapp-db}
 
-DOCKER_COMPOSE_PATH="docker/docker-compose.yml"
-
 OPTIONAL_VARS=("TODOSAPP_APP_PORT" "TODOSAPP_DB_HOST" "TODOSAPP_DB_PORT" "TODOSAPP_DB_NAME" "TODOSAPP_DB_USERNAME")
 REQUIRED_VARS=("TODOSAPP_API_IMAGE_NAME" "TODOSAPP_APP_IMAGE_NAME" "TODOSAPP_DB_PASSWORD" "TODOSAPP_ADMIN_SECRET")
-
-# Verify if docker-compose is present in the docker directory
-if [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
-    echo "[ERROR] Docker compose file could not be found under "$DOCKER_COMPOSE_PATH"."
-    exit 1
-fi
 
 # Verify if all required variables are set
 MISSING_VARS=()
