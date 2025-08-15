@@ -19,10 +19,7 @@ services:
       start_period: 2s
 
   backend:
-    build:
-      context: ../backend
-      dockerfile: ../docker/backend.Dockerfile
-      no_cache: true
+    image: ${DOCKER_API_IMAGE_NAME}
     container_name: api
     restart: always
     environment:
@@ -45,11 +42,7 @@ services:
       start_period: 5s
 
   frontend:
-    build:
-      context: ../frontend
-      dockerfile: ../docker/frontend.Dockerfile
-      additional_contexts:
-        - nginx=../nginx
+    image: ${DOCKER_APP_IMAGE_NAME}
     restart: always
     networks:
       - app-net
