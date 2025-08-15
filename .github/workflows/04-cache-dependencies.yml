@@ -53,7 +53,7 @@ jobs:
 
       - name: Load script into env
         run: |
-          echo "TODOSAPP_RUN_SCRIPT<<'EOF'" >> $GITHUB_ENV
+          echo "TODOSAPP_RUN_SCRIPT<<EOF" >> $GITHUB_ENV
           cat ./04-cache-dependencies/docker/run.sh >> $GITHUB_ENV
           echo "EOF" >> $GITHUB_ENV
 
