@@ -41,17 +41,17 @@ if [ "${#MISSING_VARS[@]}" -gt 0 ]; then
   exit 1
 fi
 
-if [ -n "${DOCKER_CACHE_PATH:-}" ]; then
-  echo "[INFO] Cache path for Docker set to $DOCKER_CACHE_PATH. Building with a custom builder..."
+if [ -n "${TODOSAPP_CACHE_PATH:-}" ]; then
+  echo "[INFO] Cache path for Docker set to $TODOSAPP_CACHE_PATH. Building with a custom builder..."
   docker buildx build -f "$API_DOCKERFILE" -t "$TODOSAPP_API_IMAGE_NAME" \
-    --cache-from "type=local,src=$DOCKER_CACHE_PATH/api" \
-    --cache-to   "type=local,dest=$DOCKER_CACHE_PATH/api,mode=max" \
+    --cache-from "type=local,src=$TODOSAPP_CACHE_PATH/api" \
+    --cache-to   "type=local,dest=$TODOSAPP_CACHE_PATH/api,mode=max" \
     --load \
     "$API_DIR"
 
   docker buildx build -f "$APP_DOCKERFILE" --build-context nginx="$NGINX_DIR" -t "$TODOSAPP_APP_IMAGE_NAME" \
-    --cache-from "type=local,src=$DOCKER_CACHE_PATH/app" \
-    --cache-to   "type=local,dest=$DOCKER_CACHE_PATH/app,mode=max" \
+    --cache-from "type=local,src=$TODOSAPP_CACHE_PATH/app" \
+    --cache-to   "type=local,dest=$TODOSAPP_CACHE_PATH/app,mode=max" \
     --load \
     "$APP_DIR"
 else
