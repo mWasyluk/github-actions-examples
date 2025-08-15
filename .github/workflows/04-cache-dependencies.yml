@@ -34,7 +34,7 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build the Dockerfile
+      - name: Build Docker images
         working-directory: 04-cache-dependencies
         run: |
           chmod +x ./docker/build.sh
@@ -51,7 +51,13 @@ jobs:
           docker push ${{ env.TODOSAPP_API_IMAGE_NAME }}
           docker push ${{ env.TODOSAPP_APP_IMAGE_NAME }}
 
-      - name: Deploy on the server via SSH
+      - name: Load script into env
+        run: |
+          echo "TODOSAPP_RUN_SCRIPT<<'EOF'" >> $GITHUB_ENV
+          cat ./04-cache-dependencies/docker/run.sh >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Run containers on the server via SSH
         uses: appleboy/ssh-action@v1
         env: 
           TODOSAPP_DB_PASSWORD: ${{ secrets.TODOSAPP_DB_PASSWORD }}
@@ -61,5 +67,5 @@ jobs:
           username: ${{ secrets.MIKRUS_USER }}
           key: ${{ secrets.MIKRUS_KEY }}
           port: ${{ secrets.MIKRUS_PORT }}
-          script_path: 04-cache-dependencies/docker/run.sh
-          envs: TODOSAPP_API_IMAGE_NAME,TODOSAPP_APP_IMAGE_NAME,TODOSAPP_DB_PASSWORD,TODOSAPP_ADMIN_SECRET
+          envs: TODOSAPP_RUN_SCRIPT,TODOSAPP_API_IMAGE_NAME,TODOSAPP_APP_IMAGE_NAME,TODOSAPP_DB_PASSWORD,TODOSAPP_ADMIN_SECRET
+          script: bash -lc "$TODOSAPP_RUN_SCRIPT"

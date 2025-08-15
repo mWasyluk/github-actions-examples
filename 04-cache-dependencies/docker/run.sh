@@ -51,7 +51,7 @@ done
 # Remove current containers if present; pull and run the newest
 echo "[INFO] Clearing space and pulling images..."
 docker rm -f $API_CONT_NAME $APP_CONT_NAME $DB_CONT_NAME >/dev/null 2>&1 || true
-docker network inspect app-net >/dev/null 2>&1 || docker network create app-net
+docker network inspect todosapp-net >/dev/null 2>&1 || docker network create todosapp-net
 
 docker pull $TODOSAPP_API_IMAGE_NAME 1>/dev/null 2>&1
 docker pull $TODOSAPP_APP_IMAGE_NAME 1>/dev/null 2>&1
@@ -60,7 +60,7 @@ echo "[INFO] Running database..."
 docker run -d \
   --name "${TODOSAPP_DB_HOST}" \
   --restart always \
-  --network app-net \
+  --network todosapp-net \
   -e POSTGRES_DB="$TODOSAPP_DB_NAME" \
   -e POSTGRES_USER="$TODOSAPP_DB_USERNAME" \
   -e POSTGRES_PASSWORD="$TODOSAPP_DB_PASSWORD" \
@@ -69,7 +69,7 @@ docker run -d \
   --health-timeout 10s \
   --health-retries 10 \
   --health-start-period 2s \
-  -v app-data:/var/lib/postgresql/data \
+  -v todosapp-data:/var/lib/postgresql/data \
   postgres:17.5-alpine3.21 1>/dev/null
 
 until [ "$(docker inspect -f "{{if .State.Health}}{{.State.Health.Status}}{{end}}" "$TODOSAPP_DB_HOST")" = "healthy" ]; do
@@ -81,7 +81,7 @@ echo "[INFO] ✅ database is healthy. Running api..."
 docker run -d \
   --name "$API_CONT_NAME" \
   --restart always \
-  --network app-net \
+  --network todosapp-net \
   -e TODOSAPP_DB_HOST="$TODOSAPP_DB_HOST" \
   -e TODOSAPP_DB_PORT="$TODOSAPP_DB_PORT" \
   -e TODOSAPP_DB_NAME="$TODOSAPP_DB_NAME" \
@@ -104,7 +104,7 @@ echo "[INFO] ✅ api is healthy. Running app..."
 docker run -d \
   --name "$APP_CONT_NAME" \
   --restart always \
-  --network app-net \
+  --network todosapp-net \
   -p "$TODOSAPP_APP_PORT:80" \
   "$TODOSAPP_APP_IMAGE_NAME" 1>/dev/null
 
