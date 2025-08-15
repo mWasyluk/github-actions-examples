@@ -7,30 +7,26 @@ on:
       - "!**README.md"
   workflow_dispatch:
 
+env: 
+  TODOSAPP_API_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:04-cache-dependencies-api
+  TODOSAPP_APP_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:04-cache-dependencies-app
+
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-      # - name: Checkout module files
-      #   uses: actions/checkout@v4
-      #   with:
-      #     sparse-checkout: "04-cache-dependencies"
-      #     sparse-checkout-cone-mode: false
-      
-      - name: Create a simple Dockerfile
-        run: |
-          cat > Dockerfile<<EOF
-          FROM nginx:stable-alpine3.21
-          WORKDIR /test
-          RUN echo "testv2" > test.txt
-          EOF
-      
+      - name: Checkout module files
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: "04-cache-dependencies"
+          sparse-checkout-cone-mode: false
+
       - name: Config cache mandagement
         uses: actions/cache@v4
         with: 
           path: ${{ runner.temp }}/.buildx-cache
-          key: ${{ runner.os }}/.buildx-${{ hashFiles('Dockerfile') }}
+          key: ${{ runner.os }}/.buildx-${{ hashFiles('04-cache-dependencies') }}
           restore-keys: |
             ${{ runner.os }}/.buildx-
         
@@ -38,10 +34,29 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build the Dockerfile
-        run: | 
-          docker buildx build \
-            --cache-to=type=local,dest=${{ runner.temp }}/.buildx-cache \
-            --cache-from=type=local,src=${{ runner.temp }}/.buildx-cache \
-            --load \
-            -t some:image \
-            .
+        working-directory: 04-cache-dependencies
+        run: ./docker/build.sh
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Push images to DockerHub
+        run: |
+          docker push ${{ env.TODOSAPP_API_IMAGE_NAME }}
+          docker push ${{ env.TODOSAPP_APP_IMAGE_NAME }}
+
+      - name: Deploy on the server via SSH
+        uses: appleboy/ssh-action@v1
+        env: 
+          TODOSAPP_DB_PASSWORD: ${{ secrets.TODOSAPP_DB_PASSWORD }}
+          TODOSAPP_ADMIN_SECRET: ${{ secrets.TODOSAPP_ADMIN_SECRET}}
+        with:
+          host: ${{ secrets.MIKRUS_HOST }}
+          username: ${{ secrets.MIKRUS_USER }}
+          key: ${{ secrets.MIKRUS_KEY }}
+          port: ${{ secrets.MIKRUS_PORT }}
+          script_path: 04-cache-dependencies/docker/run.sh
+          envs: TODOSAPP_API_IMAGE_NAME,TODOSAPP_APP_IMAGE_NAME,TODOSAPP_DB_PASSWORD,TODOSAPP_ADMIN_SECRET

@@ -9,7 +9,7 @@ API_DOCKERFILE="$DOCKER_DIR/backend.Dockerfile"
 APP_DOCKERFILE="$DOCKER_DIR/frontend.Dockerfile"
 
 REQUIRED_DIRS=("$API_DIR" "$APP_DIR" "$NGINX_DIR" "$DOCKER_DIR")
-REQUIRED_VARS=("DOCKER_API_IMAGE_NAME" "DOCKER_APP_IMAGE_NAME")
+REQUIRED_VARS=("TODOSAPP_API_IMAGE_NAME" "TODOSAPP_APP_IMAGE_NAME")
 
 # Verify if all required directories are present
 MISSING_DIRS=()
@@ -43,19 +43,19 @@ fi
 
 if [ -n "${DOCKER_CACHE_PATH:-}" ]; then
   echo "[INFO] Cache path for Docker set to $DOCKER_CACHE_PATH. Building with a custom builder..."
-  docker buildx build -f "$API_DOCKERFILE" -t "$DOCKER_API_IMAGE_NAME" \
+  docker buildx build -f "$API_DOCKERFILE" -t "$TODOSAPP_API_IMAGE_NAME" \
     --cache-from "type=local,src=$DOCKER_CACHE_PATH/api" \
     --cache-to   "type=local,dest=$DOCKER_CACHE_PATH/api,mode=max" \
     --load \
     "$API_DIR"
 
-  docker buildx build -f "$APP_DOCKERFILE" --build-context nginx="$NGINX_DIR" -t "$DOCKER_APP_IMAGE_NAME" \
+  docker buildx build -f "$APP_DOCKERFILE" --build-context nginx="$NGINX_DIR" -t "$TODOSAPP_APP_IMAGE_NAME" \
     --cache-from "type=local,src=$DOCKER_CACHE_PATH/app" \
     --cache-to   "type=local,dest=$DOCKER_CACHE_PATH/app,mode=max" \
     --load \
     "$APP_DIR"
 else
   echo "[INFO] Cache path for Docker is not set. Building with the default builder..."
-  docker build -f "$API_DOCKERFILE" -t "$DOCKER_API_IMAGE_NAME" "$API_DIR"
-  docker build --build-context nginx="$NGINX_DIR" -f "$APP_DOCKERFILE" -t "$DOCKER_APP_IMAGE_NAME" "$APP_DIR"
+  docker build -f "$API_DOCKERFILE" -t "$TODOSAPP_API_IMAGE_NAME" "$API_DIR"
+  docker build --build-context nginx="$NGINX_DIR" -f "$APP_DOCKERFILE" -t "$TODOSAPP_APP_IMAGE_NAME" "$APP_DIR"
 fi

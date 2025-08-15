@@ -2,8 +2,8 @@
 
 DOCKER_COMPOSE_PATH="docker/docker-compose.yml"
 
-OPTIONAL_VARS=("APP_PORT" "DB_PORT" "DB_HOST" "DB_NAME" "DB_USERNAME")
-REQUIRED_VARS=("DOCKER_API_IMAGE_NAME" "DOCKER_APP_IMAGE_NAME" "DB_PASSWORD" "ADMIN_SECRET")
+OPTIONAL_VARS=("TODOSAPP_APP_PORT" "TODOSAPP_DB_PORT" "TODOSAPP_DB_HOST" "TODOSAPP_DB_NAME" "TODOSAPP_DB_USERNAME")
+REQUIRED_VARS=("TODOSAPP_API_IMAGE_NAME" "TODOSAPP_APP_IMAGE_NAME" "TODOSAPP_DB_PASSWORD" "TODOSAPP_ADMIN_SECRET")
 
 # Verify if docker-compose is present in the docker directory
 if [ ! -f "$DOCKER_COMPOSE_PATH" ]; then
@@ -25,11 +25,11 @@ if [ ${#MISSING_VARS[@]} -gt 0 ]; then
     exit 1
 fi
 
-APP_PORT=${APP_PORT:=8080}
-DB_PORT=${DB_PORT:=5432}
-DB_USERNAME=${DB_NAME:=todosapp-db}
-DB_NAME=${DB_NAME:=$DB_USERNAME}
-DB_HOST=${DB_HOST:=todosapp-db-host}
+TODOSAPP_APP_PORT=${TODOSAPP_APP_PORT:=8080}
+TODOSAPP_DB_PORT=${TODOSAPP_DB_PORT:=5432}
+TODOSAPP_DB_USERNAME=${TODOSAPP_DB_NAME:=todosapp-db}
+TODOSAPP_DB_NAME=${TODOSAPP_DB_NAME:=$TODOSAPP_DB_USERNAME}
+TODOSAPP_DB_HOST=${TODOSAPP_DB_HOST:=todosapp-db}
 
 ALL_VARS=("${OPTIONAL_VARS[*]}" "${REQUIRED_VARS[*]}")
 
@@ -38,8 +38,8 @@ echo "[LOG] Running containers with the following configuration:"
 for VAR in ${ALL_VARS[@]}; do
     export $VAR=${!VAR}
     case $VAR in
-        "DB_PASSWORD") VAL=*** ;;
-        "ADMIN_SECRET") VAL=*** ;;
+        "TODOSAPP_DB_PASSWORD") VAL=*** ;;
+        "TODOSAPP_ADMIN_SECRET") VAL=*** ;;
         *) VAL=${!VAR} ;;
     esac
     printf '      %s\n' "$VAR=$VAL"
