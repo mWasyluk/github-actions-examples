@@ -1,5 +1,5 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
-import { Box, Container } from '@mui/material';
+import { Box } from '@mui/material';
 import { useMemo } from 'react';
 import { useTodos } from '../contexts/TodosContext';
 import { sortByPriorityAndTitle } from '../utils/todoUtils';
@@ -32,7 +32,7 @@ export default function TodoView() {
 
     const addButton = (
         <Button
-            variantcolor="success"
+            variantcolor="primary"
             startIcon={<AddOutlinedIcon />}
             onClick={() => showForm()}
         >
@@ -41,19 +41,19 @@ export default function TodoView() {
     );
 
     return (
-        <Container
+        <Box
             component="main"
-            maxWidth="false"
-            sx={{ py: 3, width: '100%', height: '100%' }}
+            sx={{
+                width: '1',
+                overflowY: 'auto',
+                backgroundColor: 'background.default',
+                borderRadius: '0 0 0 10px',
+                py: 3,
+                px: 2,
+            }}
         >
-            <Box sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 3,
-            }}>
-                <TodoList title={"To do"} badge={addButton} todos={todosMemo.inProgress} loading={loading} />
-                <TodoList title={"Done"} todos={todosMemo.done} loading={loading} />
-            </Box>
-        </Container>
+            <TodoList title={"To do"} badge={addButton} todos={todosMemo.inProgress} loading={loading} style={{ mb: 2 }} />
+            <TodoList title={"Done"} todos={todosMemo.done} loading={loading} />
+        </Box>
     );
 }

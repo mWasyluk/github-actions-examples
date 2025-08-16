@@ -26,6 +26,7 @@ const theme = createTheme({
         },
         background: {
             default: '#1D1D1D',
+            dark: '#0f0f0fff',
             paper: '#252525',
             light: '#2c2c2cff'
         },
@@ -44,6 +45,9 @@ const theme = createTheme({
             fontFamily: 'Genos Variable',
             fontSize: 40,
             fontWeight: 600,
+        },
+        caption: {
+            fontSize: 12,
         }
     },
     shape: {

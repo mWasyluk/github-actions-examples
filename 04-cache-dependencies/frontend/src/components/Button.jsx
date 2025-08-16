@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(MuiButton, {
     shouldForwardProp: prop => prop !== 'variantcolor'
-})(({ theme, variantcolor }) => ({
+})(({ theme, variantcolor, transparent, rounded }) => ({
     borderRadius: theme.shape.borderRadius,
     textTransform: 'none',
     ...(variantcolor === 'danger' && {
@@ -30,9 +30,24 @@ const StyledButton = styled(MuiButton, {
         backgroundColor: theme.palette.background.light,
         color: theme.palette.text.secondary,
         '&:hover': { backgroundColor: theme.palette.background.paper }
+    }),
+    ...(transparent && {
+        backgroundColor: 'transparent',
+        color: theme.palette[variantcolor].main,
+        '&:hover': {
+            backgroundColor: theme.palette[variantcolor].dark,
+            color: theme.palette[variantcolor].contrastText,
+        }
+    }),
+    ...(rounded && {
+        borderRadius: '100%',
+        "& > .MuiButton-startIcon": {
+            padding: 0,
+            margin: 0
+        }
     })
 }));
 
 export default function Button({ variantcolor = 'primary', ...props }) {
-    return <StyledButton variant="contained" variantcolor={variantcolor} {...props} />;
+    return <StyledButton variant="contained" variantcolor={variantcolor} disableElevation={props.transparent} {...props} />;
 }

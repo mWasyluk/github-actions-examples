@@ -2,7 +2,7 @@ import { Box, CircularProgress, Divider, List, Typography } from '@mui/material'
 import { useMemo } from 'react';
 import TodoItem from './TodoItem';
 
-export default function TodoList({ title = '', badge = null, todos = [], loading = false }) {
+export default function TodoList({ title = '', badge = null, todos = [], loading = false, style }) {
     const content = useMemo(() => {
         if (loading) {
             return <CircularProgress size="3rem" />
@@ -28,7 +28,8 @@ export default function TodoList({ title = '', badge = null, todos = [], loading
         <Box sx={{
             display: 'flex',
             flexDirection: 'column',
-            gap: 2,
+            gap: 1,
+            ...style
         }}>
             <Box sx={{
                 display: 'flex',

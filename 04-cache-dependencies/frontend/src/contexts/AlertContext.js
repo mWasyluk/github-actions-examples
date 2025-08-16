@@ -1,4 +1,4 @@
-import { Alert, Snackbar } from "@mui/material";
+import { Alert, Slide, Snackbar } from "@mui/material";
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 
 export const ALERT_SEVERITIES = {
@@ -41,6 +41,10 @@ export function AlertProvider({ children }) {
                 autoHideDuration={alertOpts.duration}
                 onClose={handleClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+                slots={{ transition: Slide }}
+                sx={{
+                    mb: 2
+                }}
             >
                 <Alert severity={alertOpts.severity} onClose={handleClose}>
                     {alertOpts.message}

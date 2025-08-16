@@ -2,25 +2,26 @@ import { Box } from '@mui/material';
 import Footer from './components/Footer';
 import SideBar from './components/SideBar';
 import TodoView from './components/TodoView';
+import useDimensions from './hooks/useDimensions';
 
 export default function App() {
+    const { width, height } = useDimensions();
+
     return (
         <Box
             sx={{
-                bgcolor: 'background.default',
+                bgcolor: 'background.dark',
                 display: 'flex',
                 flexDirection: 'column',
-                minHeight: '100vh',
-                minWidth: '100vh',
+                height: height,
+                width: width,
             }}
         >
             <Box sx={{
                 flex: 1,
                 display: 'flex',
                 flexDirection: 'row',
-                width: '100%',
-                height: '100%',
-                overflowY: 'true'
+                overflow: 'hidden',
             }}>
                 <SideBar />
                 <TodoView />
