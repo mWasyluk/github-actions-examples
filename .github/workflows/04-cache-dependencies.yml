@@ -1,0 +1,71 @@
+name: 04-cache-dependencies
+
+on:
+  push:
+    paths:
+      - "**04-cache-dependencies**"
+      - "!**README.md"
+  workflow_dispatch:
+
+env: 
+  TODOSAPP_API_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:04-cache-dependencies-api
+  TODOSAPP_APP_IMAGE_NAME: ${{ secrets.DOCKER_USER }}/github-actions-examples:04-cache-dependencies-app
+  TODOSAPP_CACHE_PATH: /tmp/.buildx-cache
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout module files
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: "04-cache-dependencies"
+          sparse-checkout-cone-mode: false
+
+      - name: Config cache mandagement
+        uses: actions/cache@v4
+        with: 
+          path: ${{ env.TODOSAPP_CACHE_PATH }}
+          key: ${{ runner.os }}/.buildx-${{ hashFiles('04-cache-dependencies') }}
+          restore-keys: |
+            ${{ runner.os }}/.buildx-
+        
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker images
+        working-directory: 04-cache-dependencies
+        run: |
+          chmod +x ./docker/build.sh
+          ./docker/build.sh
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USER }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Push images to DockerHub
+        run: |
+          docker push ${{ env.TODOSAPP_API_IMAGE_NAME }}
+          docker push ${{ env.TODOSAPP_APP_IMAGE_NAME }}
+
+      - name: Load script into env
+        run: |
+          echo "TODOSAPP_RUN_SCRIPT<<EOF" >> $GITHUB_ENV
+          cat ./04-cache-dependencies/docker/run.sh >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+
+      - name: Run containers on the server via SSH
+        uses: appleboy/ssh-action@v1
+        env: 
+          TODOSAPP_DB_PASSWORD: ${{ secrets.TODOSAPP_DB_PASSWORD }}
+          TODOSAPP_ADMIN_SECRET: ${{ secrets.TODOSAPP_ADMIN_SECRET}}
+        with:
+          host: ${{ secrets.MIKRUS_HOST }}
+          username: ${{ secrets.MIKRUS_USER }}
+          key: ${{ secrets.MIKRUS_KEY }}
+          port: ${{ secrets.MIKRUS_PORT }}
+          envs: TODOSAPP_RUN_SCRIPT,TODOSAPP_API_IMAGE_NAME,TODOSAPP_APP_IMAGE_NAME,TODOSAPP_DB_PASSWORD,TODOSAPP_ADMIN_SECRET
+          script: bash -lc "$TODOSAPP_RUN_SCRIPT"
