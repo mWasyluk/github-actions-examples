@@ -30,5 +30,3 @@ builds, tests and publishes a Docker image \
 - **Maven**
 - **Java**
 - **Spring & Spring Boot**
-
-⏳ Work in progress...
