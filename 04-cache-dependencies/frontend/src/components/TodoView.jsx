@@ -1,6 +1,7 @@
 import AddOutlinedIcon from '@mui/icons-material/AddOutlined';
 import { Box } from '@mui/material';
 import { useMemo } from 'react';
+import { useLocale } from '../contexts/LocaleContext';
 import { useTodos } from '../contexts/TodosContext';
 import { sortByPriorityAndTitle } from '../utils/todoUtils';
 import Button from './Button';
@@ -8,6 +9,7 @@ import TodoList from './TodoList';
 
 export default function TodoView() {
     const { todos, loading, showForm } = useTodos();
+    const { t } = useLocale();
 
     const todosMemo = useMemo(() => {
         if (loading) return {}
@@ -36,7 +38,7 @@ export default function TodoView() {
             startIcon={<AddOutlinedIcon />}
             onClick={() => showForm()}
         >
-            Add
+            {t.buttons.add}
         </Button>
     );
 
@@ -52,8 +54,8 @@ export default function TodoView() {
                 px: 2,
             }}
         >
-            <TodoList title={"To do"} badge={addButton} todos={todosMemo.inProgress} loading={loading} style={{ mb: 2 }} />
-            <TodoList title={"Done"} todos={todosMemo.done} loading={loading} />
+            <TodoList title={t.todoList.todoTitle} badge={addButton} todos={todosMemo.inProgress} loading={loading} style={{ mb: 2 }} />
+            <TodoList title={t.todoList.doneTitle} todos={todosMemo.done} loading={loading} />
         </Box>
     );
 }

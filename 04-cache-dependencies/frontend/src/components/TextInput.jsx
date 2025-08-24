@@ -23,7 +23,7 @@ export default function TextInput({
             size="small"
             sx={{
                 '& .MuiOutlinedInput-root': {
-                    backgroundColor: backgroundColor || 'background.paper',
+                    backgroundColor: backgroundColor || 'background.default',
                     borderRadius: 1,
                 }
             }}

@@ -6,6 +6,7 @@ import {
     DialogTitle,
     Typography
 } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
 import Button from './Button';
 
 export default function ConfirmationDialog({
@@ -15,6 +16,8 @@ export default function ConfirmationDialog({
     onClose,
     onConfirm
 }) {
+    const { t } = useLocale();
+
     return (
         <Dialog
             open={open}
@@ -30,10 +33,10 @@ export default function ConfirmationDialog({
             </DialogContent>
             <DialogActions>
                 <Button variantcolor="default" onClick={onClose}>
-                    Cancel
+                    {t.buttons.cancel}
                 </Button>
                 <Button variantcolor="danger" onClick={() => { onConfirm(); onClose(); }} startIcon={<GavelRoundedIcon />}>
-                    Continue
+                    {t.buttons.continue}
                 </Button>
             </DialogActions>
         </Dialog>

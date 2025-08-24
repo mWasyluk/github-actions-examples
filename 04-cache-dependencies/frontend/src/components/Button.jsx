@@ -3,7 +3,7 @@ import { styled } from '@mui/material/styles';
 
 const StyledButton = styled(MuiButton, {
     shouldForwardProp: prop => prop !== 'variantcolor'
-})(({ theme, variantcolor, transparent, rounded }) => ({
+})(({ theme, variantcolor, transparent, rounded, disabled }) => ({
     borderRadius: theme.shape.borderRadius,
     textTransform: 'none',
     ...(variantcolor === 'danger' && {
@@ -45,6 +45,11 @@ const StyledButton = styled(MuiButton, {
             padding: 0,
             margin: 0
         }
+    }),
+    ...(disabled && {
+        backgroundColor: 'unset !important',
+        color: `${theme.palette[variantcolor].main} !important`,
+        filter: 'grayscale(100%)',
     })
 }));
 

@@ -1,18 +1,17 @@
 import { Box, CircularProgress, Divider, List, Typography } from '@mui/material';
-import { useMemo } from 'react';
+import { useLocale } from '../contexts/LocaleContext';
 import TodoItem from './TodoItem';
 
 export default function TodoList({ title = '', badge = null, todos = [], loading = false, style }) {
-    const content = useMemo(() => {
-        if (loading) {
-            return <CircularProgress size="3rem" />
-        }
+    const { t } = useLocale();
 
-        if (todos.length === 0) {
-            return <Typography variant={"body2"} >No todos to display</Typography>
-        }
-
-        return (
+    var content;
+    if (loading) {
+        content = <CircularProgress size="3rem" />
+    } else if (todos.length === 0) {
+        content = <Typography variant={"body2"} >{t.todoList.noTodo}</Typography>
+    } else {
+        content = (
             <List>
                 {todos.map(todo => (
                     <TodoItem
@@ -22,7 +21,7 @@ export default function TodoList({ title = '', badge = null, todos = [], loading
                 ))}
             </List>
         )
-    }, [todos, loading])
+    }
 
     return (
         <Box sx={{

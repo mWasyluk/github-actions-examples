@@ -1,4 +1,5 @@
 import Chip from '@mui/material/Chip';
+import { useLocale } from '../contexts/LocaleContext';
 
 const colorMap = {
     minor: 'success',
@@ -7,9 +8,10 @@ const colorMap = {
 };
 
 export default function PriorityBadge({ priority = 'minor' }) {
+    const { t } = useLocale();
     return (
         <Chip
-            label={priority.charAt(0).toUpperCase() + priority.slice(1)}
+            label={t.todo.priorities[priority]}
             color={colorMap[priority]}
             size="small"
             sx={{ textTransform: 'capitalize', fontWeight: 500 }}

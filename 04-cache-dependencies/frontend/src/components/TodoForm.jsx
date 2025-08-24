@@ -7,6 +7,7 @@ import {
     DialogTitle
 } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useLocale } from '../contexts/LocaleContext';
 import Button from './Button';
 import PriorityInput from './PriorityInput';
 import TextInput from './TextInput';
@@ -17,20 +18,23 @@ export default function TodoForm({
     onSubmit,
     todo = null
 }) {
-    const isEditMode = Boolean(todo && todo.id);
+    const { t } = useLocale();
 
+    const isEditMode = Boolean(todo && todo.id);
     const [title, setTitle] = useState('');
+    const [titleError, setTitleError] = useState(false);
     const [description, setDescription] = useState('');
     const [priority, setPriority] = useState('minor');
 
-    // initialize form when opening or todo changes
     useEffect(() => {
         if (todo) {
             setTitle(todo.title || '');
+            setTitleError(false);
             setDescription(todo.description || '');
             setPriority(todo.priority || 'minor');
         } else {
             setTitle('');
+            setTitleError(false);
             setDescription('');
             setPriority('minor');
         }
@@ -38,7 +42,10 @@ export default function TodoForm({
 
     const handleSubmit = e => {
         e.preventDefault();
-        if (!title.trim()) return;
+        if (!title.trim()) {
+            setTitleError(true);
+            return;
+        }
         const payload = {
             ...(todo?.id ? { id: todo.id } : {}),
             title: title.trim(),
@@ -49,9 +56,13 @@ export default function TodoForm({
         onClose();
     };
 
+    useEffect(() => {
+        setTitleError(false);
+    }, [title])
+
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-            <DialogTitle>{isEditMode ? 'Edit Todo' : 'Add New Todo'} {(todo && todo.origin === 'server') && '(server)'}</DialogTitle>
+            <DialogTitle>{isEditMode ? t.form.editTitle : t.form.addTitle} {(todo && todo.origin === 'server') && `(${t.form.serverLabel.toLowerCase()})`}</DialogTitle>
             <DialogContent>
                 <Box
                     component="form"
@@ -60,18 +71,19 @@ export default function TodoForm({
                     sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}
                 >
                     <TextInput
-                        label="Title*"
+                        label={`${t.todo.title}*`}
                         value={title}
                         onChange={e => setTitle(e.target.value)}
                         backgroundColor="background.light"
-                        placeholder="What do you need to do?"
+                        placeholder={t.form.titlePlaceholder}
+                        error={titleError}
                     />
                     <TextInput
-                        label="Description"
+                        label={t.todo.description}
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                         backgroundColor="background.light"
-                        placeholder="How do you need to do this?"
+                        placeholder={t.form.descPlaceholder}
                         multiline
                         rows={3}
                     />
@@ -80,7 +92,7 @@ export default function TodoForm({
             </DialogContent>
             <DialogActions>
                 <Button variantcolor="danger" onClick={onClose}>
-                    Cancel
+                    {t.buttons.cancel}
                 </Button>
                 <Button
                     type="submit"
@@ -88,7 +100,7 @@ export default function TodoForm({
                     variantcolor={title.trim() ? 'success' : 'disabled'}
                     startIcon={<SaveOutlinedIcon />}
                 >
-                    {isEditMode ? 'Update' : 'Save'}
+                    {isEditMode ? t.buttons.update : t.buttons.save}
                 </Button>
             </DialogActions>
         </Dialog>

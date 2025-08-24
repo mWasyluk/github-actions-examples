@@ -1,17 +1,22 @@
 import DeleteIcon from '@mui/icons-material/Delete';
 import KeyboardDoubleArrowLeftRoundedIcon from '@mui/icons-material/KeyboardDoubleArrowLeftRounded';
-import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import SettingsSuggestRoundedIcon from '@mui/icons-material/SettingsSuggestRounded';
 import { Box, Typography } from '@mui/material';
 import { useState } from 'react';
+import { useLocale } from '../contexts/LocaleContext';
 import { useTodos } from '../contexts/TodosContext';
 import useDimensions, { SCREEN_SIZES } from '../hooks/useDimensions';
+import IconImage from '../images/icon.png';
 import Button from './Button';
+import LanguageSelector from './LanguageSelector';
 import TextInput from './TextInput';
 
 export default function SideBar() {
     const { secret, setSecret, clearAll } = useTodos();
     const screen = useDimensions();
-    const [collapsed, setCollapsed] = useState(true);
+    const { t } = useLocale();
+
+    const [collapsed, setCollapsed] = useState(false);
 
     var width, contentWidth;
     width = 60;
@@ -34,40 +39,53 @@ export default function SideBar() {
 
     const fullContent = (
         <>
-            <Typography variant="h5" component="h1" typography="title" sx={{ textAlign: 'center' }}>TodosApp</Typography>
-
-            <Button
-                startIcon={<KeyboardDoubleArrowLeftRoundedIcon sx={{ width: 32, height: 32, mr: "2px" }} />}
-                onClick={() => setCollapsed(!collapsed)}
-                rounded
-                transparent
-                variantcolor="primary"
-                sx={{ alignSelf: 'end', minWidth: 0, width: 42, height: 42 }}
+            <Box
+                sx={{
+                    display: 'flex',
+                    position: 'relative',
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    gap: '10px',
+                    width: '100%',
+                    height: 56
+                }}
             >
-            </Button>
+                <img src={IconImage} width='32' />
+                <Typography variant="h5" component="h1" typography="title" color='primary' sx={{ textAlign: 'center', lineHeight: '120%' }}>TodosApp</Typography>
+                <Button
+                    startIcon={<KeyboardDoubleArrowLeftRoundedIcon sx={{ width: 32, height: 32, mr: "2px" }} />}
+                    onClick={() => setCollapsed(!collapsed)}
+                    rounded
+                    transparent
+                    variantcolor="primary"
+                    sx={{ position: 'absolute', minWidth: 0, width: 42, height: 42, right: -25, backgroundColor: 'background.dark' }}
+                >
+                </Button>
+            </Box>
+
+            <LanguageSelector />
 
             <Typography variant="body2" align="center">
-                Hi there! 👋
+                {t.info.greeting}
             </Typography>
             <Typography variant="body2" align="center">
-                This page hosts a little demo app that I built to encourage visitors to try out
-                a few things, but you can also use it as your own personal to-do list ✔.
+                {t.info.section1}
             </Typography>
             <Typography variant="body2" align="center" sx={{}}>
-                Just so you know: adding or editing publicly visible tasks is only possible if
-                you’ve got the admin password 🔑. That means everything you do here will stay
-                visible only to you (unless you somehow hacked my password... in that case,
-                please don’t cause chaos <span style={{ whiteSpace: 'nowrap' }}>🙃🔥</span>).
+                {t.info.section2}
             </Typography>
 
             <TextInput
-                label="secret"
+                label={t.form.secret}
                 value={secret}
+                type="password"
                 onChange={e => setSecret(e.target.value)}
                 variant="outlined"
                 size="small"
                 fullWidth
             />
+
+            <div style={{ height: '100%' }}></div>
 
             <Button
                 startIcon={<DeleteIcon />}
@@ -76,16 +94,19 @@ export default function SideBar() {
                 variantcolor="danger"
                 sx={{ alignSelf: 'center' }}
             >
-                Delete all data
+                {t.buttons.deleteAllData}
             </Button>
         </>
     );
 
     const collapsedContent = (
         <>
-            <Typography variant="h5" component="h1" typography="title" sx={{ alignSelf: 'center' }}>TA</Typography>
+            <div style={{ height: 56, justifyContent: 'center', paddingTop: '12px', display: 'flex', height: '100%' }}>
+                <img src={IconImage} width='32' height='32' onClick={() => setCollapsed(!collapsed)} style={{ cursor: 'pointer' }} />
+            </div>
+
             <Button
-                startIcon={<MenuRoundedIcon sx={{ width: 32, height: 32 }} />}
+                startIcon={<SettingsSuggestRoundedIcon sx={{ width: 32, height: 32, mb: 0.5 }} />}
                 onClick={() => setCollapsed(!collapsed)}
                 rounded
                 transparent
@@ -106,18 +127,18 @@ export default function SideBar() {
                 transition: 'width 200ms ease',
             }}
         >
-            <Box sx={{
-                backgroundColor: 'background.dark',
-                overflowY: 'auto',
-                overflowX: 'hidden',
-                width: contentWidth,
-                transition: 'width 200ms ease',
-                height: '100%',
-                padding: '16px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 2,
-            }}>
+            <Box
+                sx={{
+                    backgroundColor: 'background.dark',
+                    width: contentWidth,
+                    transition: 'width 200ms ease',
+                    height: '100%',
+                    padding: '16px',
+                    paddingBottom: '0',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    gap: 2,
+                }}>
                 {collapsed ? (
                     collapsedContent
                 ) : (

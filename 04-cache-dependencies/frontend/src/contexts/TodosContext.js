@@ -7,14 +7,16 @@ import {
 } from '../api/todosApi';
 import ConfirmationDialog from '../components/ConfirmationDialog';
 import TodoForm from '../components/TodoForm';
-import eng from '../locales/eng';
 import {
     mapServerTodo,
     mapToServerPayload
 } from '../utils/todoUtils';
 import { ALERT_SEVERITIES, useAlert } from './AlertContext';
+import { useLocale } from './LocaleContext';
 
 const TodosContext = createContext(null);
+
+const LS_KEY = "todosAppState";
 
 export function TodosProvider({ children, onReset = () => { } }) {
     const [loading, setLoading] = useState(true);
@@ -24,6 +26,7 @@ export function TodosProvider({ children, onReset = () => { } }) {
     const [confirmDialog, setConfirmDialog] = useState({ open: false, onConfirm: () => { } });
 
     const { showAlert } = useAlert();
+    const { t } = useLocale();
     const localCounter = useRef(1);
 
     // Initialization: merge localStorage and server data
@@ -31,10 +34,10 @@ export function TodosProvider({ children, onReset = () => { } }) {
         async function initialize() {
             let localTodos = [];
             try {
-                const raw = localStorage.getItem('todosAppState');
+                const raw = localStorage.getItem(LS_KEY);
                 localTodos = raw ? JSON.parse(raw).todos : [];
             } catch {
-                showAlert(eng.notifications.readLocalError, ALERT_SEVERITIES.ERROR);
+                showAlert(t.notifications.error.notReadLocal, ALERT_SEVERITIES.ERROR);
             }
 
             let serverTodos = [];
@@ -42,7 +45,7 @@ export function TodosProvider({ children, onReset = () => { } }) {
                 const data = await getTodos();
                 serverTodos = data.map(mapServerTodo);
             } catch {
-                showAlert(eng.notifications.readServerError, ALERT_SEVERITIES.ERROR);
+                showAlert(t.notifications.error.notReadServer, ALERT_SEVERITIES.ERROR);
             }
 
 
@@ -84,12 +87,9 @@ export function TodosProvider({ children, onReset = () => { } }) {
         if (!Array.isArray(todos)) return;
 
         try {
-            localStorage.setItem(
-                'todosAppState',
-                JSON.stringify({ todos })
-            );
+            localStorage.setItem(LS_KEY, JSON.stringify({ todos }));
         } catch {
-            showAlert(eng.notifications.saveLocalError, ALERT_SEVERITIES.ERROR)
+            showAlert(t.notifications.error.notSavedLocal, ALERT_SEVERITIES.ERROR)
         } finally {
             setLoading(false);
         }
@@ -102,22 +102,20 @@ export function TodosProvider({ children, onReset = () => { } }) {
             const tempId = `local-${localCounter.current++}`;
             const localTodo = { id: tempId, title, description, priority, isDone: false, origin: 'local' };
             setTodos(prev => [...prev, localTodo]);
-            showAlert(eng.notifications.savedLocal, ALERT_SEVERITIES.SUCCESS);
+            showAlert(t.notifications.success.savedLocal, ALERT_SEVERITIES.SUCCESS);
         } else {
             // server only
             try {
                 const data = await postTodo(secret, { title, description, priority: mapToServerPayload({ title, description, priority }).priority });
                 const serverTodo = mapServerTodo(data);
                 setTodos(prev => [...prev, serverTodo]);
-                showAlert(eng.notifications.savedServer, ALERT_SEVERITIES.SUCCESS);
+                showAlert(t.notifications.success.savedServer, ALERT_SEVERITIES.SUCCESS);
             } catch (err) {
                 var msg;
-                if (err.response?.status === 404) {
-                    msg = eng.notifications.notFoundServer;
-                } else if (err.response?.status === 401) {
-                    msg = eng.notifications.unauthorizedServer;
+                if (err.response?.status === 401) {
+                    msg = t.notifications.error.unauthorized;
                 } else {
-                    msg = eng.notifications.badRequestServerError;
+                    msg = t.notifications.error.unknown;
                 }
                 showAlert(msg, ALERT_SEVERITIES.ERROR);
             }
@@ -135,22 +133,20 @@ export function TodosProvider({ children, onReset = () => { } }) {
             // local only
             console.log(newState)
             setTodos(prev => prev.map(t => t.id === id ? { ...newState } : t));
-            showAlert(eng.notifications.savedLocal, ALERT_SEVERITIES.SUCCESS);
+            showAlert(t.notifications.success.savedLocal, ALERT_SEVERITIES.SUCCESS);
         } else {
             // server only
             try {
                 const data = await putTodo(secret, id, mapToServerPayload(newState));
                 const serverTodo = mapServerTodo(data);
                 setTodos(prev => prev.map(t => t.id === id ? { ...newState, serverTodo } : t));
-                showAlert(eng.notifications.savedServer, ALERT_SEVERITIES.SUCCESS);
+                showAlert(t.notifications.success.savedServer, ALERT_SEVERITIES.SUCCESS);
             } catch (err) {
                 var msg;
-                if (err.response?.status === 404) {
-                    msg = eng.notifications.notFoundServer;
-                } else if (err.response?.status === 401) {
-                    msg = eng.notifications.unauthorizedServer;
+                if (err.response?.status === 401) {
+                    msg = t.notifications.error.unauthorized;
                 } else {
-                    msg = eng.notifications.badRequestServerError;
+                    msg = t.notifications.error.unknown;
                 }
                 showAlert(msg, ALERT_SEVERITIES.ERROR);
             }
@@ -158,35 +154,34 @@ export function TodosProvider({ children, onReset = () => { } }) {
     }
 
     const deleteTodo = async id => {
-        const serverMatch = todos.find(t => t.id === id && t.origin === 'server');
+        const todo = todos.find(t => t.id === id);
+        if (!todo) {
+            showAlert(t.notifications.error.unknown, ALERT_SEVERITIES.ERROR);
+            return;
+        }
+
+        const serverMatch = todo.origin === 'server';
         if (serverMatch && !secret) {
-            showAlert(eng.notifications.modifyServerWithoutSecretError, ALERT_SEVERITIES.ERROR);
+            showAlert(t.notifications.error.noSecret, ALERT_SEVERITIES.ERROR);
             return;
         }
 
         async function handleDelete() {
-            if (!secret) {
-                // local only
-                if (serverMatch) {
-                    showAlert(eng.notifications.modifyServerWithoutSecretError, ALERT_SEVERITIES.ERROR);
-                } else {
-                    setTodos(prev => prev.filter(t => t.id !== id));
-                    showAlert(eng.notifications.savedLocal, ALERT_SEVERITIES.SUCCESS);
-                }
+            if (!serverMatch) {
+                setTodos(prev => prev.filter(t => t.id !== id));
+                showAlert(t.notifications.success.savedLocal, ALERT_SEVERITIES.SUCCESS);
             } else {
                 // server only
                 try {
                     await deleteTodoApi(secret, id);
                     setTodos(prev => prev.filter(t => t.id !== id));
-                    showAlert(eng.notifications.savedServer, ALERT_SEVERITIES.SUCCESS);
+                    showAlert(t.notifications.success.savedServer, ALERT_SEVERITIES.SUCCESS);
                 } catch (err) {
                     var msg;
-                    if (err.response?.status === 404) {
-                        msg = eng.notifications.notFoundServer;
-                    } else if (err.response?.status === 401) {
-                        msg = eng.notifications.unauthorizedServer;
+                    if (err.response?.status === 401) {
+                        msg = t.notifications.error.unauthorized;
                     } else {
-                        msg = eng.notifications.badRequestServerError;
+                        msg = t.notifications.error.unknown;
                     }
                     showAlert(msg, ALERT_SEVERITIES.ERROR);
                 }
@@ -209,12 +204,12 @@ export function TodosProvider({ children, onReset = () => { } }) {
         var todo = id ? todos.find(t => t.id === id) : null;
 
         if (id && !todo) {
-            showAlert(eng.notifications.unknownError, ALERT_SEVERITIES.ERROR);
+            showAlert(t.notifications.error.unknown, ALERT_SEVERITIES.ERROR);
             return;
         }
 
         if (todo && todo.origin === 'server' && !secret) {
-            showAlert(eng.notifications.modifyServerWithoutSecretError, ALERT_SEVERITIES.ERROR);
+            showAlert(t.notifications.error.noSecret, ALERT_SEVERITIES.ERROR);
             return;
         }
 
@@ -239,11 +234,11 @@ export function TodosProvider({ children, onReset = () => { } }) {
             }}
         >
             {children}
-            <TodoForm open={form.open} onSubmit={form.onSubmit} todo={form.todo} onClose={() => setForm({ open: false })} />
+            <TodoForm open={form.open} onSubmit={form.onSubmit} todo={form.todo} onClose={() => setForm({ ...form, open: false })} />
             <ConfirmationDialog
                 open={confirmDialog.open}
-                title="This action cannot be undone"
-                description="All changes are permanent and cannot be recovered. Are you sure you want to continue?"
+                title={t.dialogs.delete.title}
+                description={t.dialogs.delete.description}
                 onClose={() => setConfirmDialog({ open: false })}
                 onConfirm={() => confirmDialog.onConfirm()}
             />

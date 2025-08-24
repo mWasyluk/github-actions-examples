@@ -26,8 +26,8 @@ export default function useDimensions() {
         return () => window.removeEventListener('resize', handleResize);
     }, []);
 
-    const size = width < 480 ? SCREEN_SIZES.SMALL
-        : width < 900 ? SCREEN_SIZES.MEDIUM
+    const size = width < 700 ? SCREEN_SIZES.SMALL
+        : width < 1080 ? SCREEN_SIZES.MEDIUM
             : SCREEN_SIZES.LARGE;
 
     return { width, height, size };

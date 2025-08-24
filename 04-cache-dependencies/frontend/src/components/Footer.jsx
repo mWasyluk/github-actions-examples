@@ -1,9 +1,14 @@
 import { Link, Typography } from '@mui/material';
+import { useLocale } from '../contexts/LocaleContext';
+
+const year = new Date().getFullYear();
 
 export default function Footer() {
+    const { t } = useLocale();
+
     return (
         <Typography variant="caption" color="text.secondary" sx={{ px: 2, py: 0.5, textAlign: 'center' }}>
-            ©2025{' '}
+            ©{year}{' '}
             <Link
                 href="https://mwasyluk.pl"
                 target="_blank"
@@ -12,7 +17,7 @@ export default function Footer() {
             >
                 mwasyluk.pl
             </Link>
-            . All rights reserved.
+            {`. ${t.footer.copyright}.`}
         </Typography>
     );
 }
