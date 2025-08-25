@@ -42,11 +42,12 @@ done
 
 # Remove current containers if present; pull and run the newest
 echo "[INFO] Clearing space and pulling images..."
-docker rm -f $API_CONT_NAME $APP_CONT_NAME $DB_CONT_NAME >/dev/null 2>&1 || true
-docker network inspect todosapp-net >/dev/null 2>&1 || docker network create todosapp-net
 
 docker pull $TODOSAPP_API_IMAGE_NAME 1>/dev/null 2>&1
 docker pull $TODOSAPP_APP_IMAGE_NAME 1>/dev/null 2>&1
+
+docker rm -f $API_CONT_NAME $APP_CONT_NAME $DB_CONT_NAME >/dev/null 2>&1 || true
+docker network inspect todosapp-net >/dev/null 2>&1 || docker network create todosapp-net
 
 echo "[INFO] Running database..."
 docker run -d \

@@ -11,12 +11,24 @@ import Button from './Button';
 import LanguageSelector from './LanguageSelector';
 import TextInput from './TextInput';
 
+const VISITED_KEY = "todosapp:visited";
+
+// Set collapsed to false only on first visit
+const getInitialCollapsed = () => {
+    const alredyVisited = localStorage.getItem(VISITED_KEY);
+    if (!alredyVisited) {
+        localStorage.setItem(VISITED_KEY, true);
+        return false;
+    }
+    return true;
+}
+
 export default function SideBar() {
     const { secret, setSecret, clearAll } = useTodos();
     const screen = useDimensions();
     const { t } = useLocale();
 
-    const [collapsed, setCollapsed] = useState(false);
+    const [collapsed, setCollapsed] = useState(getInitialCollapsed());
 
     var width, contentWidth;
     width = 60;
